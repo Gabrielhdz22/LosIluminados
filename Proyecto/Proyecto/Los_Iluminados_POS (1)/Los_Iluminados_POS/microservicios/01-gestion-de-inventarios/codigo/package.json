@@ -1,0 +1,14 @@
+{
+  "name": "gestion-inventario",
+  "version": "1.0.0",
+  "description": "Aplicación web para gestionar inventario con Express y SQLite",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.11.1",
+    "express": "^5.2.1"
+  }
+}

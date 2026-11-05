@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Documentación · Servicio de autenticación</title>
+    <style>
+      :root {
+        --fondo: #f3f5f9;
+        --superficie: #ffffff;
+        --texto: #233047;
+        --secundario: #526078;
+        --borde: #dce3ed;
+        --acento: #2457c5;
+        --suave: #edf3ff;
+        --codigo: #111c30;
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        color: var(--texto);
+        background: var(--fondo);
+        line-height: 1.75;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+      }
+      .saltar {
+        position: absolute;
+        top: -100px;
+        left: 16px;
+        padding: 8px 16px;
+        background: var(--superficie);
+      }
+      .saltar:focus {
+        top: 8px;
+      }
+      .cabecera {
+        border-bottom: 1px solid var(--borde);
+        background: var(--superficie);
+      }
+      .barra {
+        max-width: 1080px;
+        margin: auto;
+        padding: 20px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .marca {
+        font-size: 0.95rem;
+        font-weight: 750;
+        letter-spacing: -0.02em;
+      }
+      .marca span {
+        color: var(--acento);
+        margin-right: 10px;
+      }
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        font-size: 0.875rem;
+      }
+      nav a {
+        text-decoration: none;
+        font-weight: 600;
+      }
+      main {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 0 24px;
+      }
+      .etiqueta {
+        color: var(--acento);
+        font-size: 0.75rem;
+        font-weight: 750;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin: 0 0 14px 4px;
+      }
+      article {
+        background: var(--superficie);
+        border: 1px solid var(--borde);
+        border-radius: 16px;
+        padding: clamp(20px, 5vw, 60px);
+        box-shadow: 0 12px 40px #10204408;
+        overflow-wrap: anywhere;
+      }
+      article > :first-child {
+        margin-top: 0;
+      }
+      article > :last-child {
+        margin-bottom: 0;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        line-height: 1.3;
+        letter-spacing: -0.025em;
+      }
+      h1 {
+        font-size: clamp(1.9rem, 4vw, 2.65rem);
+        margin-bottom: 24px;
+      }
+      h2 {
+        font-size: 1.5rem;
+        margin-top: 48px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--borde);
+      }
+      h3 {
+        font-size: 1.15rem;
+        margin-top: 32px;
+      }
+      p,
+      ul,
+      ol {
+        margin: 18px 0;
+      }
+      li + li {
+        margin-top: 8px;
+      }
+      ul,
+      ol {
+        padding-left: 24px;
+      }
+      a {
+        color: var(--acento);
+        text-underline-offset: 3px;
+      }
+      a:hover {
+        text-decoration-thickness: 2px;
+      }
+      a:focus-visible {
+        outline: 3px solid var(--acento);
+        outline-offset: 4px;
+        border-radius: 2px;
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 0.86em;
+        padding: 0.2em 0.4em;
+        border-radius: 5px;
+        background: var(--suave);
+      }
+      pre {
+        background: var(--codigo);
+        color: #e0e9f8;
+        padding: 22px;
+        border-radius: 10px;
+        overflow-x: auto;
+        line-height: 1.65;
+      }
+      pre code {
+        background: transparent;
+        padding: 0;
+        border-radius: 0;
+        overflow-wrap: normal;
+      }
+      table {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        margin: 24px 0;
+      }
+      th,
+      td {
+        padding: 12px 16px;
+        border: 1px solid var(--borde);
+        text-align: left;
+        vertical-align: top;
+      }
+      th {
+        background: var(--suave);
+        font-weight: 650;
+      }
+      blockquote {
+        margin: 24px 0;
+        padding: 4px 20px;
+        border-left: 4px solid var(--acento);
+        background: var(--suave);
+        color: var(--secundario);
+      }
+      hr {
+        border: 0;
+        border-top: 1px solid var(--borde);
+        margin: 32px 0;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+      footer {
+        text-align: center;
+        color: var(--secundario);
+        font-size: 0.8rem;
+        padding: 0 24px 32px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --fondo: #0c1220;
+          --superficie: #141e30;
+          --texto: #e0e7f2;
+          --secundario: #a4b2c9;
+          --borde: #2d3b52;
+          --acento: #96b9ff;
+          --suave: #202e46;
+          --codigo: #0b1322;
+        }
+      }
+      @media (max-width: 600px) {
+        .barra {
+          padding: 16px 20px;
+        }
+        main {
+          margin: 24px auto;
+          padding: 0 12px;
+        }
+        article {
+          border-radius: 12px;
+        }
+        th,
+        td {
+          padding: 10px;
+        }
+        pre {
+          padding: 16px;
+        }
+      }
+      @media print {
+        :root {
+          color-scheme: light;
+          --fondo: white;
+          --superficie: white;
+          --texto: black;
+          --secundario: #333;
+          --borde: #ccc;
+          --acento: #164799;
+          --suave: #f4f4f4;
+        }
+        .cabecera,
+        .etiqueta,
+        footer {
+          display: none;
+        }
+        main {
+          max-width: none;
+          margin: 0;
+          padding: 0;
+        }
+        article {
+          padding: 0;
+          border: 0;
+          box-shadow: none;
+        }
+        pre {
+          white-space: pre-wrap;
+          overflow-wrap: anywhere;
+          background: #f4f4f4;
+          color: black;
+        }
+        table {
+          display: table;
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="saltar" href="#contenido">Saltar al contenido</a>
+    <header class="cabecera">
+      <div class="barra">
+        <div class="marca">Servicio de autenticación</div>
+        <nav aria-label="Documentación de la API">
+          <a href="/docs">Swagger UI ↗</a>
+          <a href="/redoc">ReDoc ↗</a>
+        </nav>
+      </div>
+    </header>
+    <main id="contenido">
+      <p class="etiqueta">Documentación del servicio</p>
+      <article aria-label="README">$contenido</article>
+    </main>
+    <footer>Servicio de autenticación · Documentación</footer>
+  </body>
+</html>

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Servicio 15 - Gestión de Inventario</title>
+<style>
+*{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#f4f6f8;color:#17202a}
+header{background:#17202a;color:white;padding:22px 32px;display:flex;justify-content:space-between;align-items:center}
+header h1{margin:0;font-size:24px} header span{opacity:.75;font-size:14px}
+.container{max-width:1180px;margin:28px auto;padding:0 20px}
+.grid{display:grid;grid-template-columns:1.05fr 1.95fr;gap:22px}
+.card{background:white;border-radius:14px;padding:22px;box-shadow:0 4px 18px #00000012}
+h2{font-size:18px;margin:0 0 18px}.muted{color:#697586;font-size:13px}
+label{display:block;font-size:13px;font-weight:700;margin:15px 0 7px}
+select,input{width:100%;padding:11px 12px;border:1px solid #d8dee6;border-radius:8px;font-size:14px;background:#fff}
+.stock-box{display:flex;align-items:center;justify-content:space-between;background:#f7f8fa;padding:18px;border-radius:10px;margin:18px 0}
+.stock-number{font-size:34px;font-weight:800}.stock-label{font-size:12px;color:#697586}
+.status{padding:6px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.ok{background:#e8f5e9}.low{background:#fff4d6}.critical{background:#fde8e8}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}
+button{border:0;border-radius:8px;padding:12px;font-weight:700;cursor:pointer;font-size:14px}
+.btn-in{background:#e8f5e9}.btn-out{background:#fde8e8}.btn-main{background:#17202a;color:white;width:100%;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:12px 9px;border-bottom:1px solid #edf0f3}th{color:#697586;font-size:12px}
+.in{color:#16803c;font-weight:700}.out{color:#c0392b;font-weight:700}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px}
+.kpi{background:white;padding:17px;border-radius:12px;box-shadow:0 4px 18px #0000000c}.kpi strong{font-size:25px;display:block}.kpi small{color:#697586}
+.message{display:none;padding:12px;border-radius:8px;margin-top:12px;font-size:13px}.success{background:#e8f5e9}.error{background:#fde8e8}
+.product-management{margin-top:22px;border-top:1px solid #edf0f3;padding-top:20px}.product-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.btn-add{background:#e8f5e9}.btn-remove{background:#fde8e8}.api{margin-top:22px;background:#111827;color:#d1d5db;border-radius:12px;padding:18px;font-family:Consolas,monospace;font-size:12px;overflow:auto}
+.api-title{color:#fff;font-family:Inter,Arial,sans-serif;font-weight:700;margin-bottom:10px}
+@media(max-width:850px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>Gestión de Inventario</h1><span>Administración de productos y existencias</span></div>
+  
+</header>
+
+<div class="container">
+  <div class="kpis">
+    <div class="kpi"><small>Productos registrados</small><strong id="totalProducts">0</strong></div>
+    <div class="kpi"><small>Unidades en inventario</small><strong id="totalUnits">0</strong></div>
+    <div class="kpi"><small>Productos con stock bajo</small><strong id="lowProducts">0</strong></div>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Actualizar inventario</h2>
+      <p class="muted">Registra una entrada por compra o una salida por venta.</p>
+
+      <label for="product">Producto</label>
+      <select id="product"></select>
+
+      <div class="stock-box">
+        <div><div class="stock-label">EXISTENCIA ACTUAL</div><div class="stock-number" id="stock">0</div></div>
+        <div id="status" class="status ok">Disponible</div>
+      </div>
+
+      <label for="quantity">Cantidad</label>
+      <input id="quantity" type="number" min="1" value="1">
+
+      <div class="actions">
+        <button class="btn-in" onclick="registerTransaction('compra')">＋ Registrar compra</button>
+        <button class="btn-out" onclick="registerTransaction('venta')">− Registrar venta</button>
+      </div>
+      <div id="message" class="message"></div>
+
+      <button class="btn-main" onclick="refresh()">Actualizar vista</button>
+
+      <div class="product-management">
+        <h2 style="margin-bottom:8px">Gestionar productos</h2>
+        <p class="muted">Agrega un producto nuevo o elimina un producto del catálogo.</p>
+
+        <label for="newId">ID del producto</label>
+        <input id="newId" type="text" placeholder="Ej. P006">
+
+        <label for="newName">Nombre del producto</label>
+        <input id="newName" type="text" placeholder="Ej. Cámara web">
+
+        <label for="newStock">Existencia inicial</label>
+        <input id="newStock" type="number" min="0" value="0">
+
+        <label for="newMin">Stock mínimo</label>
+        <input id="newMin" type="number" min="0" value="5">
+
+        <div class="product-actions">
+          <button class="btn-add" onclick="addProduct()">＋ Añadir producto</button>
+          <button class="btn-remove" onclick="removeProduct()">− Eliminar producto</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Inventario actual</h2>
+      <table>
+        <thead><tr><th>ID</th><th>Producto</th><th>Existencia</th><th>Mínimo</th><th>Estado</th><th>Actualización</th></tr></thead>
+        <tbody id="inventory"></tbody>
+      </table>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:22px">
+    <h2>Historial de movimientos</h2>
+    <table>
+      <thead><tr><th>Fecha</th><th>Producto</th><th>Operación</th><th>Cantidad</th><th>Existencia resultante</th></tr></thead>
+      <tbody id="history"></tbody>
+    </table>
+  </section>
+
+  <section class="api">
+    <div class="api-title">Estado de conexión y respuesta de la API</div>
+    <pre id="apiResponse">Esperando una operación...</pre>
+  </section>
+</div>
+
+<script>
+const products = [];
+
+let history = [];
+
+function now(){
+  return new Date().toLocaleString("es-MX",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
+}
+function selected(){return products.find(p=>p.id===document.getElementById("product").value)}
+function status(p){
+  if(p.stock===0) return ["Agotado","critical"];
+  if(p.stock<=p.min) return ["Stock bajo","low"];
+  return ["Disponible","ok"];
+}
+function renderSelect(){
+  const s=document.getElementById("product");
+  const current=s.value;
+  s.innerHTML=products.map(p=>`<option value="${p.id}">${p.id} · ${p.name}</option>`).join("");
+  if(current && products.some(p=>p.id===current)) s.value=current;
+  s.onchange=showSelected;
+}
+function showSelected(){
+  const p=selected(); if(!p)return;
+  document.getElementById("stock").textContent=p.stock;
+  const [txt,cls]=status(p), st=document.getElementById("status");
+  st.textContent=txt; st.className="status "+cls;
+}
+function renderInventory(){
+  document.getElementById("inventory").innerHTML=products.map(p=>{
+    const [txt,cls]=status(p);
+    return `<tr><td>${p.id}</td><td>${p.name}</td><td><strong>${p.stock}</strong></td><td>${p.min}</td><td><span class="status ${cls}">${txt}</span></td><td>${p.updated}</td></tr>`;
+  }).join("");
+}
+function renderHistory(){
+  document.getElementById("history").innerHTML=history.map(h=>{
+    const c=h.type==="Entrada"||h.type==="Compra"?"in":"out", sign=h.type==="Entrada"||h.type==="Compra"?"+":"-";
+    return `<tr><td>${h.date}</td><td>${h.product}</td><td class="${c}">${h.type}</td><td class="${c}">${sign}${h.qty}</td><td>${h.result}</td></tr>`;
+  }).join("");
+}
+function renderKpis(){
+  document.getElementById("totalProducts").textContent=products.length;
+  document.getElementById("totalUnits").textContent=products.reduce((a,p)=>a+p.stock,0);
+  document.getElementById("lowProducts").textContent=products.filter(p=>p.stock<=p.min).length;
+}
+function registerTransaction(type){
+  const p=selected(), q=parseInt(document.getElementById("quantity").value);
+  const msg=document.getElementById("message");
+  if(!q || q<1){msg.textContent="Ingresa una cantidad válida.";msg.className="message error";msg.style.display="block";return}
+  if(type==="venta" && q>p.stock){
+    msg.textContent=`Venta rechazada: solo hay ${p.stock} unidades disponibles.`;
+    msg.className="message error";msg.style.display="block";return;
+  }
+  const before=p.stock;
+  p.stock += type==="compra" ? q : -q;
+  p.updated=now();
+  const label=type==="compra"?"Compra":"Venta";
+  history.unshift({date:p.updated,product:p.name,type:label,qty:q,result:p.stock});
+  msg.textContent=type==="venta"
+    ? `Venta registrada. ${p.name}: ${before} → ${p.stock} unidades.`
+    : `Compra registrada. ${p.name}: ${before} → ${p.stock} unidades.`;
+  msg.className="message success";msg.style.display="block";
+  document.getElementById("apiResponse").textContent=JSON.stringify({
+    operacion:label.toUpperCase(),
+    id_producto:p.id,
+    cantidad:q,
+    existencia_anterior:before,
+    existencia_actual:p.stock,
+    fecha_actualizacion:p.updated,
+    estado:"Inventario actualizado"
+  },null,2);
+  refresh();
+}
+
+function move(type){
+  const p=selected(), q=parseInt(document.getElementById("quantity").value);
+  const msg=document.getElementById("message");
+  if(!q || q<1){msg.textContent="Ingresa una cantidad válida.";msg.className="message error";msg.style.display="block";return}
+  if(type==="salida" && q>p.stock){
+    msg.textContent=`Operación rechazada: solo hay ${p.stock} unidades disponibles.`;
+    msg.className="message error";msg.style.display="block";return;
+  }
+  const before=p.stock;
+  p.stock += type==="entrada" ? q : -q;
+  p.updated=now();
+  history.unshift({date:p.updated,product:p.name,type:type==="entrada"?"Entrada":"Salida",qty:q,result:p.stock});
+  msg.textContent=`Operación realizada. ${p.name}: ${before} → ${p.stock} unidades.`;
+  msg.className="message success";msg.style.display="block";
+  document.getElementById("apiResponse").textContent=JSON.stringify({
+    id_producto:p.id,
+    tipo_operacion:type.toUpperCase(),
+    cantidad:q,
+    existencia_anterior:before,
+    existencia_actual:p.stock,
+    fecha_actualizacion:p.updated,
+    estado:"Inventario actualizado"
+  },null,2);
+  refresh();
+}
+
+function addProduct(){
+  const id=document.getElementById("newId").value.trim().toUpperCase();
+  const name=document.getElementById("newName").value.trim();
+  const stock=parseInt(document.getElementById("newStock").value);
+  const min=parseInt(document.getElementById("newMin").value);
+  const msg=document.getElementById("message");
+
+  if(!id || !name || isNaN(stock) || stock<0 || isNaN(min) || min<0){
+    msg.textContent="Completa correctamente los datos del nuevo producto.";
+    msg.className="message error"; msg.style.display="block"; return;
+  }
+  if(products.some(p=>p.id===id)){
+    msg.textContent="Ese ID de producto ya existe.";
+    msg.className="message error"; msg.style.display="block"; return;
+  }
+
+  products.push({id:id,name:name,stock:stock,min:min,updated:now()});
+  msg.textContent=`Producto ${name} agregado correctamente al catálogo.`;
+  msg.className="message success"; msg.style.display="block";
+
+  document.getElementById("newId").value="";
+  document.getElementById("newName").value="";
+  document.getElementById("newStock").value=0;
+  document.getElementById("newMin").value=5;
+
+  document.getElementById("apiResponse").textContent=JSON.stringify({
+    operacion:"ALTA_PRODUCTO",
+    id_producto:id,
+    producto:name,
+    existencia_inicial:stock,
+    stock_minimo:min,
+    estado:"Producto agregado"
+  },null,2);
+
+  refresh();
+  document.getElementById("product").value=id;
+  showSelected();
+}
+
+function removeProduct(){
+  const p=selected(), msg=document.getElementById("message");
+  if(!p){
+    msg.textContent="Selecciona un producto para eliminar.";
+    msg.className="message error"; msg.style.display="block"; return;
+  }
+
+  const index=products.findIndex(x=>x.id===p.id);
+  if(!confirm(`¿Eliminar el producto "${p.name}" del catálogo?`)) return;
+
+  products.splice(index,1);
+  history=history.filter(h=>h.product!==p.name);
+
+  msg.textContent=`Producto ${p.name} eliminado correctamente del catálogo.`;
+  msg.className="message success"; msg.style.display="block";
+
+  document.getElementById("apiResponse").textContent=JSON.stringify({
+    operacion:"BAJA_PRODUCTO",
+    id_producto:p.id,
+    producto:p.name,
+    estado:"Producto eliminado"
+  },null,2);
+
+  refresh();
+}
+
+function refresh(){renderSelect();showSelected();renderInventory();renderHistory();renderKpis()}
+refresh();
+</script>
+<script>
+function escapeHTML(value){
+  return String(value).replace(/[&<>"']/g,character=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[character]));
+}
+function showMessage(text,kind){
+  const msg=document.getElementById("message");
+  msg.textContent=text;msg.className="message "+kind;msg.style.display="block";
+}
+async function apiRequest(url,options={}){
+  const response=await fetch(url,{...options,headers:{"Content-Type":"application/json",...(options.headers||{})}});
+  if(response.status===204)return null;
+  const data=await response.json();
+  if(!response.ok)throw new Error(data.error||"No se pudo completar la operación.");
+  return data;
+}
+function renderSelect(){
+  const select=document.getElementById("product"),current=select.value;
+  select.innerHTML=products.length
+    ?products.map(product=>`<option value="${escapeHTML(product.id)}">${escapeHTML(product.id)} · ${escapeHTML(product.name)}</option>`).join("")
+    :"<option value=\"\">No hay productos registrados</option>";
+  if(current&&products.some(product=>product.id===current))select.value=current;
+  select.onchange=showSelected;
+}
+function renderInventory(){
+  document.getElementById("inventory").innerHTML=products.length?products.map(product=>{
+    const [text,cssClass]=status(product);
+    return `<tr><td>${escapeHTML(product.id)}</td><td>${escapeHTML(product.name)}</td><td><strong>${product.stock}</strong></td><td>${product.min}</td><td><span class="status ${cssClass}">${text}</span></td><td>${escapeHTML(new Date(product.updated).toLocaleString("es-MX"))}</td></tr>`;
+  }).join(""):'<tr><td colspan="6">No hay productos registrados.</td></tr>';
+}
+function renderHistory(){
+  document.getElementById("history").innerHTML=history.length?history.map(movement=>{
+    const isPurchase=movement.type==="Compra",cssClass=isPurchase?"in":"out",sign=isPurchase?"+":"-";
+    return `<tr><td>${escapeHTML(new Date(movement.date).toLocaleString("es-MX"))}</td><td>${escapeHTML(movement.product)}</td><td class="${cssClass}">${movement.type}</td><td class="${cssClass}">${sign}${movement.qty}</td><td>${movement.result}</td></tr>`;
+  }).join(""):'<tr><td colspan="5">Aún no hay movimientos registrados.</td></tr>';
+}
+window.refresh=async function(){
+  try{
+    const [savedProducts,savedMovements]=await Promise.all([apiRequest("/api/products"),apiRequest("/api/movements")]);
+    products.splice(0,products.length,...savedProducts);
+    history=savedMovements.map(movement=>({...movement,type:movement.type==="compra"?"Compra":"Venta"}));
+    renderSelect();showSelected();renderInventory();renderHistory();renderKpis();
+    if(!document.getElementById("apiResponse").textContent||document.getElementById("apiResponse").textContent==="Esperando una operación..."){
+      document.getElementById("apiResponse").textContent=JSON.stringify({estado:"Conectado",base_de_datos:"SQLite",productos:savedProducts.length},null,2);
+    }
+  }catch(error){
+    showMessage("No se pudo conectar con la API. Inicia el servidor con npm run dev.","error");
+    document.getElementById("apiResponse").textContent=JSON.stringify({estado:"Sin conexión",error:error.message},null,2);
+  }
+};
+window.registerTransaction=async function(type){
+  const product=selected(),quantity=Number(document.getElementById("quantity").value);
+  if(!product)return showMessage("Primero registra o selecciona un producto.","error");
+  if(!Number.isSafeInteger(quantity)||quantity<1)return showMessage("Ingresa una cantidad válida.","error");
+  try{
+    const movement=await apiRequest("/api/movements",{method:"POST",body:JSON.stringify({productId:product.id,type,quantity})});
+    showMessage(`${type==="compra"?"Compra":"Venta"} registrada. ${product.name}: ${movement.previousStock} → ${movement.result} unidades.`,"success");
+    document.getElementById("apiResponse").textContent=JSON.stringify({operacion:type.toUpperCase(),id_producto:product.id,cantidad:quantity,existencia_anterior:movement.previousStock,existencia_actual:movement.result,fecha_actualizacion:movement.date,estado:"Guardado en SQLite"},null,2);
+    await window.refresh();
+  }catch(error){showMessage(error.message,"error");}
+};
+window.addProduct=async function(){
+  const id=document.getElementById("newId").value.trim().toUpperCase();
+  const name=document.getElementById("newName").value.trim();
+  const stock=Number(document.getElementById("newStock").value),min=Number(document.getElementById("newMin").value);
+  if(!id||!name||!Number.isSafeInteger(stock)||stock<0||!Number.isSafeInteger(min)||min<0)return showMessage("Completa correctamente los datos del nuevo producto.","error");
+  try{
+    await apiRequest("/api/products",{method:"POST",body:JSON.stringify({id,name,stock,min})});
+    document.getElementById("newId").value="";document.getElementById("newName").value="";document.getElementById("newStock").value="0";document.getElementById("newMin").value="5";
+    showMessage(`Producto ${name} agregado correctamente al catálogo.`,"success");
+    document.getElementById("apiResponse").textContent=JSON.stringify({operacion:"ALTA_PRODUCTO",id_producto:id,producto:name,existencia_inicial:stock,stock_minimo:min,estado:"Guardado en SQLite"},null,2);
+    await window.refresh();document.getElementById("product").value=id;showSelected();
+  }catch(error){showMessage(error.message,"error");}
+};
+window.removeProduct=async function(){
+  const product=selected();
+  if(!product)return showMessage("Selecciona un producto para eliminar.","error");
+  if(!confirm(`¿Eliminar el producto "${product.name}" del catálogo?`))return;
+  try{
+    await apiRequest(`/api/products/${encodeURIComponent(product.id)}`,{method:"DELETE"});
+    showMessage(`Producto ${product.name} eliminado. El historial de movimientos se conserva.`,"success");
+    document.getElementById("apiResponse").textContent=JSON.stringify({operacion:"BAJA_PRODUCTO",id_producto:product.id,producto:product.name,estado:"Eliminado de SQLite"},null,2);
+    await window.refresh();
+  }catch(error){showMessage(error.message,"error");}
+};
+window.refresh();
+</script>
+</body>
+</html>

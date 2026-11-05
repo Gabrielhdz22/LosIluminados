@@ -1,0 +1,51 @@
+# Variables de entorno y secretos locales
+.env
+.env.*
+!.env.example
+
+# Entornos virtuales y herramientas de Python
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# Cachés y archivos compilados de Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+.coverage.*
+htmlcov/
+
+# Artefactos de empaquetado y distribución
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Caché y archivos locales de uv
+.uv/
+
+# Logs y archivos temporales
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Editores e IDEs
+.idea/
+.vscode/
+*.code-workspace
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+Desktop.ini
+

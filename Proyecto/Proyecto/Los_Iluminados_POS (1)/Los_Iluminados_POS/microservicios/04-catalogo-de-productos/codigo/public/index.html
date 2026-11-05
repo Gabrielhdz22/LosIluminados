@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dulce Barro — Catálogo de cerámica</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Figtree:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#FFF6F9;--surface:#FFFFFF;--ink:#3B3A5C;--muted:#7C7A99;--line:#F6DCE7;
+  --cobalt:#FFB7D0;--on-cobalt:#3B3A5C;--accent:#D6477F;--sun:#BFDFFF;--tile:#DCEBFF;--tile2:#FFE3EE;--tag:#FFD3E3;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1F1B33;--surface:#2A2547;--ink:#FFEAF2;--muted:#B9B2D6;--line:#3D3660;--cobalt:#FFB7D0;--on-cobalt:#2A2547;--accent:#FF9CC2;--sun:#4A6CA8;--tile:#332E57;--tile2:#3F2F55;--tag:#5A3A63;}}
+:root[data-theme="dark"]{--bg:#1F1B33;--surface:#2A2547;--ink:#FFEAF2;--muted:#B9B2D6;--line:#3D3660;--cobalt:#FFB7D0;--on-cobalt:#2A2547;--accent:#FF9CC2;--sun:#4A6CA8;--tile:#332E57;--tile2:#3F2F55;--tag:#5A3A63;}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.55 Figtree,system-ui,sans-serif}
+h1,h2,h3{font-family:Fredoka,Figtree,system-ui,sans-serif;margin:0;line-height:1.05;letter-spacing:-.02em}
+.wrap{max-width:1160px;margin:0 auto;padding:0 clamp(16px,4vw,32px)}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+
+header.top{display:flex;align-items:center;justify-content:space-between;padding:20px 0;border-bottom:1px solid var(--line)}
+.logo{font:700 1.4rem Fredoka,sans-serif;text-decoration:none;letter-spacing:-.03em}
+.logo span{color:var(--accent)}
+nav.links{display:flex;gap:clamp(14px,3vw,28px);font-weight:500;font-size:.95rem}
+nav.links a{text-decoration:none;color:var(--muted)}
+nav.links a:hover{color:var(--ink)}
+.bag{font-weight:600;border:2px solid var(--cobalt);background:var(--cobalt)!important;color:var(--on-cobalt)!important;border-radius:999px;padding:6px 14px;font-size:.9rem;font-family:inherit}
+
+.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(24px,5vw,64px);align-items:center;padding:clamp(36px,7vw,88px) 0}
+.hero h1{font-size:clamp(2.6rem,7vw,5.4rem);font-weight:700}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero p{max-width:44ch;color:var(--muted);font-size:1.1rem;margin:20px 0 28px}
+.btn{display:inline-block;box-shadow:0 4px 0 var(--accent);background:var(--cobalt);color:var(--on-cobalt);font-weight:600;text-decoration:none;padding:13px 24px;border-radius:999px;border:0;font-family:inherit;font-size:1rem}
+.stage{position:relative;aspect-ratio:1/1;background:var(--sun);border-radius:50% 50% 24px 24px;display:flex;overflow:hidden}
+#heroArt{position:absolute;inset:0}
+#heroArt img{width:100%;height:100%;object-fit:cover}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding:22px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:500 .92rem Figtree,sans-serif;padding:8px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--cobalt);color:var(--on-cobalt);border-color:var(--cobalt)}
+.count{color:var(--muted);font-size:.92rem}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:clamp(18px,3vw,32px);padding:36px 0 72px;margin:0;list-style:none}
+.card{display:flex;flex-direction:column}
+.thumb{position:relative;aspect-ratio:4/5;border-radius:28px;background:var(--tile);overflow:hidden;display:grid;place-items:center}
+.card:nth-child(even) .thumb{background:var(--tile2)}
+.thumb img{width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
+.card:hover .thumb img{transform:scale(1.05)}
+.ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--accent);font-size:.95rem;font-weight:600;text-align:center;position:absolute;inset:14px;border:2px dashed currentColor;border-radius:20px}
+#heroArt .ph{inset:22px}
+.ph svg{width:44px;height:44px}
+.tag{position:absolute;top:12px;left:12px;background:var(--surface);color:var(--ink);font-weight:600;font-size:.8rem;padding:4px 11px;border-radius:999px}
+.tag.sun{background:var(--tag)}
+.add{position:absolute;right:12px;bottom:12px;width:42px;height:42px;border-radius:50%;border:0;background:var(--cobalt);color:var(--on-cobalt);font-size:1.4rem;line-height:1;cursor:pointer;opacity:0;transform:translateY(6px);transition:.2s}
+.card:hover .add,.add:focus-visible{opacity:1;transform:none}
+@media (hover:none){.add{opacity:1;transform:none}}
+.info{display:flex;justify-content:space-between;gap:12px;padding:14px 4px 0}
+.info h3{font-size:1.2rem;font-weight:700}
+.info p{margin:4px 0 0;color:var(--muted);font-size:.92rem}
+.price{font:700 1.15rem Fredoka,sans-serif;white-space:nowrap}
+.price s{display:block;color:var(--muted);font:400 .85rem Figtree,sans-serif;text-align:right}
+
+footer{border-top:1px solid var(--line);padding:32px 0 40px;color:var(--muted);font-size:.92rem;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
+
+@media (max-width:760px){.hero{grid-template-columns:1fr}.stage{max-width:420px}nav.links{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="logo" href="#">Dulce<span>Barro</span></a>
+    <nav class="links" aria-label="Principal"><a href="#catalogo">Catálogo</a><a href="#">Taller</a><a href="#">Contacto</a></nav>
+    <button class="bag" type="button">Bolsa (0)</button>
+  </header>
+
+  <section class="hero">
+    <div>
+      <h1>Cerámica suave, <em>hecha a mano</em> para tu mesa.</h1>
+      <p>Tazas, platos y jarrones torneados en lotes pequeños. Cada pieza lleva esmalte propio, así que no hay dos iguales.</p>
+      <a class="btn" href="#catalogo">Ver catálogo</a>
+    </div>
+    <div class="stage" aria-hidden="true">
+      <div id="heroArt"></div>
+    </div>
+  </section>
+
+  <section id="catalogo" aria-labelledby="t">
+    <h2 id="t" style="font-size:clamp(1.8rem,4vw,2.6rem);padding-bottom:22px">Todas las piezas</h2>
+    <div class="toolbar">
+      <div class="chips" id="chips" role="group" aria-label="Filtrar por categoría"></div>
+      <span class="count" id="count"></span>
+    </div>
+    <ul class="grid" id="grid"></ul>
+  </section>
+
+  <footer><span>Dulce Barro · Los Mochis, Sinaloa</span><span>Envíos a todo México en 3 a 5 días</span></footer>
+</div>
+<script src="/catalogo.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+[project]
+name = "servicio-autenticacion"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "bcrypt>=5.0.0",
+    "fastapi[all]>=0.141.1",
+    "markdown-it-py>=4.2.0",
+    "pyjwt>=2.14.0",
+]

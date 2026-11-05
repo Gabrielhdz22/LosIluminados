@@ -1,0 +1,13 @@
+{
+  "name": "dulce-barro",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node servidor.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "msnodesqlv8": "^6.0.0",
+    "mssql": "^11.0.1"
+  }
+}

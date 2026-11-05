@@ -1,0 +1,14 @@
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Compilación de .NET
+bin/
+obj/
+
+# Archivos de configuración locales
+.env
+.env.*
+!.env.example
